@@ -1,4 +1,4 @@
-FROM logstash:2.2
+FROM docker.elastic.co/logstash/logstash:7.6.2
 
 # add custom config
 COPY logstash.conf /config-dir/logstash.conf

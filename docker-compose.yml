@@ -1,6 +1,9 @@
 elasticsearch:
-   image: elasticsearch:2.2
+   image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
    restart: always
+   environment:
+      - xpack.security.enabled=true
+      - discovery.type=single-node
    log_opt:
       max-size: "10m"
       max-file: "10"
@@ -12,6 +15,11 @@ elasticsearch:
 logstash:
    build: logstash
    restart: always
+   environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      xpack.monitoring.enabled: "true"
+      xpack.monitoring.elasticsearch.username: logstash_system
+      xpack.monitoring.elasticsearch.password: ${LOGSTASH_PASSWORD}
    log_opt:
       max-size: "10m"
       max-file: "10"
@@ -22,21 +30,16 @@ logstash:
      - elasticsearch
 
 kibana:
-   build: kibana
+   image: docker.elastic.co/kibana/kibana:7.6.2
+   environment:
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+      ELASTICSEARCH_USERNAME: kibana
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
    restart: always
    log_opt:
       max-size: "10m"
       max-file: "10"
    ports:
       - 5601:5601
-   links:
-      - elasticsearch
-
-curator:
-   build: curator
-   restart: always
-   log_opt:
-      max-size: "10m"
-      max-file: "10"
    links:
       - elasticsearch
